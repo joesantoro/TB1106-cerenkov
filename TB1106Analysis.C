@@ -31,6 +31,7 @@ void TB1106Analysis() {
    
     double vertexX, vertexY, vertexZ;
     double hitsX, hitsY, hitsZ;
+    int PID;
 
     tr->SetBranchAddress("vertexX", &vertexX);
     tr->SetBranchAddress("vertexY", &vertexY);
@@ -38,6 +39,7 @@ void TB1106Analysis() {
     tr->SetBranchAddress("hitsX", &hitsX);
     tr->SetBranchAddress("hitsY", &hitsY);
     tr->SetBranchAddress("hitsZ", &hitsZ);
+    tr->SetBranchAddress("fEvent", &PID);
 
  //THE HISTOGRAMS
     gStyle->SetHistFillColor(8);
@@ -55,6 +57,9 @@ void TB1106Analysis() {
     TH1D* hVz = new TH1D("hVz", "Vertex position Z(mm)", 100, -1000.0, 1000.0);
     TH1D* hHz = new TH1D("hHz", "Hit position Z(mm)", 100, -300.0, 300.0);
 
+    //HISTO OF PARTICLE PIDS IN DETECTOR VOLUME
+    TH1D* hPID = new TH1D("hPID", "PID", 100, -100.0, 100.0);
+
     //2D plot(s)
     TH2* hHxHy = new TH2F("hHxHy", "X-Y distribution of detector hits", 100, -300.0, 300.0, 100, -300.0, 300.0);
    
@@ -68,14 +73,19 @@ void TB1106Analysis() {
     for (Int_t i = 0; i<nentries; i++)
     {
         tr->GetEntry(i);
-        hVx->Fill(vertexX);
-        hVy->Fill(vertexY);
-        hVz->Fill(vertexZ);
-        hHx->Fill(hitsX);
-        hHy->Fill(hitsY);
-        hHz->Fill(hitsZ);
-        hHxHy->Fill(hitsX, hitsY);
-        hVxVyVz->Fill(vertexX, vertexZ,vertexY);
+
+        if (PID == 22) { //FILTER OUT ALL HITS BUT PHOTONS
+            hVx->Fill(vertexX);
+            hVy->Fill(vertexY);
+            hVz->Fill(vertexZ);
+            hHx->Fill(hitsX);
+            hHy->Fill(hitsY);
+            hHz->Fill(hitsZ);
+            hHxHy->Fill(hitsX, hitsY);
+            hVxVyVz->Fill(vertexX, vertexZ, vertexY);
+        }
+
+        hPID->Fill(PID);
     }
     
   //The 1st canvas
@@ -93,7 +103,10 @@ void TB1106Analysis() {
       Can2->Divide(2, 1);
       Can2->cd(1); hHxHy->Draw("Colz");
       Can2->cd(2); hVxVyVz->Draw("Colz");
-  
+ 
+//The 3rd canvas
+      TCanvas* Can3 = new TCanvas("c3", "PID");
+      hPID->Draw();
 
 
 }
