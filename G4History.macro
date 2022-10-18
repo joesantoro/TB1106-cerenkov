@@ -1,0 +1,74 @@
+/run/verbose 2
+/process/optical/processActivation Scintillation 0
+/run/physicsModified
+/run/initialize
+/control/execute vis.mac
+/vis/open OGL 1200x1200-0+0
+/vis/sceneHandler/create OGL
+/vis/viewer/create ! ! 1200x1200-0+0
+/vis/viewer/refresh
+/vis/viewer/set/autoRefresh false
+/vis/verbose errors
+/vis/drawVolume
+/vis/scene/create
+/vis/scene/add/volume world -1 -1 none m 0 0 0 0 0 0
+/vis/sceneHandler/attach
+/vis/viewer/set/style wireframe
+/vis/viewer/set/auxiliaryEdge true
+/vis/viewer/set/lineSegmentsPerCircle 100
+/vis/scene/add/trajectories smooth
+/tracking/storeTrajectory 2
+/vis/scene/notifyHandlers
+/vis/scene/add/hits
+/vis/scene/notifyHandlers
+/vis/modeling/trajectories/create/drawByParticleID
+/vis/modeling/trajectories/drawByParticleID-0/default/setDrawStepPts true
+/vis/scene/notifyHandlers scene-0
+/vis/modeling/trajectories/list
+/vis/modeling/trajectories/drawByParticleID-0/set gamma yellow
+/vis/scene/notifyHandlers scene-0
+/vis/modeling/trajectories/drawByParticleID-0/set e- red
+/vis/scene/notifyHandlers scene-0
+/vis/modeling/trajectories/drawByParticleID-0/setDefaultRGBA 0.5 0.1 0.8 1.0
+/vis/scene/notifyHandlers scene-0
+/vis/filtering/trajectories/create/particleFilter
+/vis/filtering/trajectories/particleFilter-0/add e-
+/vis/scene/notifyHandlers scene-0
+/vis/filtering/trajectories/particleFilter-0/add e+
+/vis/scene/notifyHandlers scene-0
+/vis/filtering/trajectories/particleFilter-0/add opticalphoton
+/vis/scene/notifyHandlers scene-0
+/vis/filtering/trajectories/list
+/vis/scene/endOfEventAction accumulate 50
+/vis/set/textColour Orange
+/vis/scene/add/text2D 0.7 -.9 20 ! ! Cerenkov
+/vis/scene/notifyHandlers
+/vis/set/textColour
+/vis/scene/add/scale
+/vis/scene/notifyHandlers
+/vis/scene/add/axes
+/vis/scene/notifyHandlers
+/vis/scene/add/eventID
+/vis/scene/notifyHandlers
+/vis/set/colour Orange
+/vis/set/lineWidth 3
+/vis/scene/add/frame
+/vis/scene/notifyHandlers
+/vis/set/colour
+/vis/set/lineWidth
+/vis/scene/add/date 14 0.51 0.9 left
+/vis/scene/notifyHandlers
+/vis/geometry/set/visibility World 0 false
+/vis/scene/notifyHandlers
+/vis/geometry/set/colour Envelope 0.1 1.0 0.9 0.3
+/vis/scene/notifyHandlers
+/vis/geometry/set/colour solidTank 0.5 0.5 0.5 0.3
+/vis/scene/notifyHandlers
+/vis/geometry/set/colour solidTankBottom 0.5 0.5 0.5 0.3
+/vis/scene/notifyHandlers
+/vis/viewer/set/style surface
+/vis/viewer/set/hiddenMarker true
+/vis/viewer/set/viewpointThetaPhi 120 150
+/vis/viewer/set/autoRefresh true
+/vis/viewer/refresh
+/vis/verbose warnings

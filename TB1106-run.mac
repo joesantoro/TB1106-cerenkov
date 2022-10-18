@@ -1,0 +1,36 @@
+# Macro file for TB1106
+# 
+# Can be run in batch, without graphic
+# or interactively: Idle> /control/execute TB1106-run.mac
+#
+# Change the default number of workers (in multi-threading mode) 
+#/run/numberOfThreads 4
+#
+
+# Initialize kernel
+
+######## SUPPRESS SOME OPTICAL PROCESSESS WE DON'T CARE ABOUT
+
+#/process/optical/processActivation OpRayleigh 0
+#/process/optical/processActivation OpMieHG 0
+#/process/optical/processActivation OpWLS2 0
+/process/optical/processActivation Scintillation 0
+#/process/optical/processActivation OpWLS 0
+
+
+/run/initialize
+#
+/run/printProgress 1000
+/control/verbose 2
+/run/verbose 1
+/event/verbose 0
+/tracking/verbose 0
+
+# gamma 6 MeV to the direction (0.,-1.,0.)
+#
+/gun/particle gamma
+/gun/energy 6 MeV
+#
+/run/beamOn 100000
+
+#
