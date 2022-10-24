@@ -92,6 +92,13 @@ G4VPhysicalVolume* TB1106DetectorConstruction::Construct()
      1.000, 1.000, 1.000, 1.000, 1.000, 1.000, 1.000, 1.000
   };
 
+  std::vector<G4double> rindexDetector = {
+     1.88163, 1.88163, 1.88163, 1.88163, 1.88163, 1.88163, 1.88163, 1.88163,
+     1.88163, 1.88163, 1.88163, 1.88163, 1.88163, 1.88163, 1.88163, 1.88163,
+     1.88163, 1.88163, 1.88163, 1.88163, 1.88163, 1.88163, 1.88163, 1.88163,
+     1.88163, 1.88163, 1.88163, 1.88163, 1.88163, 1.88163, 1.88163, 1.88163
+  };
+
   std::vector<G4double> absorption = {
     3.448 * m,  4.082 * m,  6.329 * m,  9.174 * m,  12.346 * m, 13.889 * m,
     15.152 * m, 17.241 * m, 18.868 * m, 20.000 * m, 26.316 * m, 35.714 * m,
@@ -109,6 +116,10 @@ G4VPhysicalVolume* TB1106DetectorConstruction::Construct()
   G4MaterialPropertiesTable* tank_mat = new G4MaterialPropertiesTable();
   tank_mat->AddProperty("RINDEX", photonEnergy, rindexTank)->SetSpline(true);
   Tank_mat->SetMaterialPropertiesTable(tank_mat);
+
+  G4MaterialPropertiesTable* det_mat = new G4MaterialPropertiesTable();
+  det_mat->AddProperty("RINDEX", photonEnergy, rindexDetector)->SetSpline(true);
+  Det_mat->SetMaterialPropertiesTable(det_mat);
 
   G4MaterialPropertiesTable* Worldptr = new G4MaterialPropertiesTable();
   Worldptr->AddProperty("RINDEX", photonEnergy, rindexWorld)->SetSpline(true);

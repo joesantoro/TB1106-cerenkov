@@ -59,17 +59,30 @@ void TB1106RunAction::BeginOfRunAction(const G4Run*)
 
   //MY ADDITIONS FOR THE CREATION OF A ROOT DATA FILE 
   //FOR MORE SOPHISTICATED ANALYSIS AND OUTPUT THAN THE ACCUMULABLE VARIABLES
-  G4AnalysisManager* man = G4AnalysisManager::Instance();
+  G4AnalysisManager* man  = G4AnalysisManager::Instance();
+  
   man->OpenFile("output.root");
-  man->CreateNtuple("Hits", "Hits");
-  man->CreateNtupleIColumn("fEvent");
-  man->CreateNtupleDColumn("hitsX");
-  man->CreateNtupleDColumn("hitsY");
-  man->CreateNtupleDColumn("hitsZ");
-  man->CreateNtupleDColumn("vertexX");
-  man->CreateNtupleDColumn("vertexY");
-  man->CreateNtupleDColumn("vertexZ");
-  man->FinishNtuple();
+
+    man->CreateNtuple("Production", "Production");
+
+    man->CreateNtupleIColumn(0,"fEvent"); //PID
+    man->CreateNtupleDColumn(0,"vertexX");//VERTEX POSITIONS
+    man->CreateNtupleDColumn(0,"vertexY");
+    man->CreateNtupleDColumn(0,"vertexZ");
+    man->CreateNtupleDColumn(0,"dirX");   //DIRECTION COSINES
+    man->CreateNtupleDColumn(0,"dirY");
+    man->CreateNtupleDColumn(0,"dirZ");
+    man->CreateNtupleIColumn(0,"EventID"); //Event ID
+    man->FinishNtuple(0);
+
+ //Cerenkov detector-specific histograms
+    man->CreateNtuple("Hits", "Hits");
+
+    man->CreateNtupleDColumn(1,"CerHitX");//DETECTOR HIT POSITION
+    man->CreateNtupleDColumn(1,"CerHitY");
+    man->CreateNtupleDColumn(1,"CerHitZ");
+    man->CreateNtupleIColumn(1,"EventID"); //Event ID
+    man->FinishNtuple(1);
 
 }
 
@@ -127,7 +140,7 @@ void TB1106RunAction::EndOfRunAction(const G4Run* run)
      << "--------------------End of Local Run------------------------";
   }
   
-  G4cout
+  /*G4cout
      << G4endl
      << " The run consists of " << nofEvents << " "<< runCondition
      << G4endl
@@ -136,7 +149,7 @@ void TB1106RunAction::EndOfRunAction(const G4Run* run)
      << G4endl
      << "------------------------------------------------------------"
      << G4endl
-     << G4endl;
+     << G4endl;*/
 
   //MY ADDITIONS FOR THE CREATION OF A ROOT DATA FILE
   G4AnalysisManager* man = G4AnalysisManager::Instance();
