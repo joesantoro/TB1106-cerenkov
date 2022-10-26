@@ -9,6 +9,7 @@
 #include "TStyle.h"
 #include "TGFileBrowser.h"
 #include "TGFileDialog.h"
+#include "TGProgressBar.h"
 #include "TF1.h"
 #include "TLegend.h"
 #include "TLatex.h"
@@ -23,7 +24,8 @@ void TB1106Analysis() {
     
     fname = file.fFilename;
     cout << "Opening ROOT file: " << fname << endl;
-    
+    //delete B;
+
     TFile* f = new TFile(fname);
 
     cout << "The file contains the following NTuples:" << "\n";
@@ -33,12 +35,13 @@ void TB1106Analysis() {
     tr->ls();
     TNtuple* tr2 = (TNtuple*)f->Get("Production");
     tr2->ls();
+    cout << "----------------------------------------" << "\n\n";
 
     double vertexX, vertexY, vertexZ;
     double dirX, dirY, dirZ;
-    int PID, EventID1,EventID2,numEvents;
-
     double CerHitX, CerHitY, CerHitZ;
+    int PID, EventID1,EventID2,numEvents, nentries,nentries2;
+   
 
     tr->SetBranchAddress("CerHitX", &CerHitX);
     tr->SetBranchAddress("CerHitY", &CerHitY);
@@ -48,17 +51,22 @@ void TB1106Analysis() {
     tr2->SetBranchAddress("vertexX", &vertexX);
     tr2->SetBranchAddress("vertexY", &vertexY);
     tr2->SetBranchAddress("vertexZ", &vertexZ);
-    tr2->SetBranchAddress("dirX", &dirX);
-    tr2->SetBranchAddress("dirY", &dirY);
-    tr2->SetBranchAddress("dirZ", &dirZ);
-    tr2->SetBranchAddress("fEvent", &PID);
+    tr2->SetBranchAddress("dirX",    &dirX);
+    tr2->SetBranchAddress("dirY",    &dirY);
+    tr2->SetBranchAddress("dirZ",    &dirZ);
+    tr2->SetBranchAddress("fEvent",  &PID);
     tr2->SetBranchAddress("EventID", &EventID2);
 
-    numEvents = (Int_t)tr2->GetMaximum("EventID");
-    cout << " THE NUMBER OF EVENTS GENERATED IN THIS RUN IS: " << numEvents << "\n";
+    numEvents = (Int_t)tr2->GetMaximum("EventID"); //EVENTS GENERATED
 
+    nentries  =  (Int_t)tr->GetEntries(); //ENTRIES IN THE HIT NTUPLE
+    nentries2 = (Int_t)tr2->GetEntries(); //ENTRIES IN THE PRODUCTION NTUPLE
 
- //THE HISTOGRAMS
+    double hit_event_ID[nentries];
+
+    cout << "THERE ARE " << numEvents << " EVENTS GENERATED IN THIS RUN" <<  "\n";
+    cout << "THERE ARE " << nentries2 << " CERENKOV TRACKS" << "\n";
+    cout << "THERE ARE " << nentries  << " HITS IN THE DETECTOR ARRAY" << "\n\n";
 
     //HISTO OF PARTICLE PIDS IN DETECTOR VOLUME
     gStyle->SetHistFillColor(8);
@@ -86,17 +94,58 @@ void TB1106Analysis() {
     TH2* hHxHy   = new TH2F("hHxHy"  , "X-Y distribution of Detector hits", 100, -300.0, 300.0, 100, -300.0, 300.0);
 
     //3D plot(s)
-    TH3* hVxVyVz = new TH3F("hVxVyVz", "3D distribution of Cerenkov Vertex Positions", 100, -250.0, 250.0, 100, -250.0, 250.0, 100, -250.0, 250.0);
+    TH3* hVxVyVz = new TH3F("hVxVyVz", "3D distribution of Detected Cerenkov Vertex Positions", 100, -250.0, 250.0, 100, -250.0, 250.0, 100, -250.0, 250.0);
     
 
+    //EVENT LOOP TO FILL THE HIT HISTOGRAMS
+    TH1D* hEvents = new TH1D("hEvents", "Event ID", 100, 0, numEvents);
+
+    cout << "HIT LOOP" << "\n";
+    cout << "========" << "\n";
+    cout << "PROCESSING " << nentries << " HITS IN THE DETECTOR ARRAY" << "\n\n";
+//-------------------------------------------------------------------------------
+    for (Int_t i = 0; i <= nentries; i++)
+    {
+        tr->GetEntry(i);
+        hHx->Fill(CerHitX);
+        hHy->Fill(CerHitY);
+        hHz->Fill(CerHitZ);
+        hHxHy->Fill(CerHitX, CerHitY);
+        hEvents->Fill(EventID1);
+        hit_event_ID[i]=EventID1;
+    }
+
     //EVENT LOOP TO FILL THE PRODUCTION HISTOGRAMS
-    Int_t nentries2 = (Int_t)tr2->GetEntries();
     cout << "PRODUCTION LOOP" << "\n";
     cout << "===============" << "\n";
     cout << "PROCESSING " << nentries2 << " CERENKOV TRACKS" << "\n\n";
 
-    for (Int_t i = 0; i < nentries2; i++)
+    //----- PROGRESS BAR -------------------
+    TGMainFrame* fMain         = new TGMainFrame(gClient->GetDefaultRoot(), 1000, 500);
+    TGHorizontalFrame* fHFrame = new TGHorizontalFrame(fMain, 0, 0, 0);
+    TGHProgressBar* progBar    = new TGHProgressBar(fHFrame, 500);
+
+    progBar->SetBarColor("lightblue");
+    progBar->ShowPosition(kTRUE, kFALSE, "%.0f tracks");
+    progBar->SetRange(0, nentries2);
+
+    fHFrame->Resize(300, 300);
+    fHFrame->AddFrame(progBar);
+    fMain->AddFrame(fHFrame);
+    fMain->SetWindowName("Processing Cerenkov Tracks and Correlating Detector Hits");
+    TGDimension size = fMain->GetDefaultSize();
+    fMain->Resize(size);
+    fMain->MapSubwindows();
+    fMain->MapWindow();
+
+    progBar->Reset();
+
+//---------------------------------------------------------------------
+    for (Int_t i = 0; i <= nentries2; i++)
     {
+        progBar->Increment(1);
+        gSystem->ProcessEvents();
+
         tr2->GetEntry(i);
         hVx->Fill(vertexX);
         hVy->Fill(vertexY);
@@ -104,31 +153,16 @@ void TB1106Analysis() {
         hDx->Fill(dirX);
         hDy->Fill(dirY);
         hDz->Fill(dirZ);
-        hVxVyVz->Fill(vertexX, vertexZ, vertexY);
         hPID->Fill(PID);
+
+        for (Int_t j = 1; j<=nentries; j++)
+        {
+            if (EventID2 == hit_event_ID[j]) {
+                hVxVyVz->Fill(vertexX, vertexZ, vertexY);
+             }
+            }
     }
 
-    //EVENT LOOP TO FILL THE HIT HISTOGRAMS
-    TH1D* hEvents = new TH1D("hEvents", "Event ID", 100, 0, numEvents);
-    Int_t nentries = (Int_t)tr->GetEntries();
-
-    cout << "HIT LOOP" << "\n";
-    cout << "========" << "\n";
-    cout << "PROCESSING " << nentries << " HITS IN THE DETECTOR ARRAY" << "\n\n";
-
-    for (Int_t i = 0; i<nentries; i++)
-    {
-            tr->GetEntry(i);
-            hHx->Fill(CerHitX);
-            hHy->Fill(CerHitY);
-            hHz->Fill(CerHitZ);
-            hHxHy->Fill(CerHitX, CerHitY);
-            hEvents->Fill(EventID1);
-            //cout << "Event Number: "<< EventID1 << "\n";
-
-             
-    }
-    
     cout << "RENDERING HISTOGRAMS AND PLOTS..." << "\n";
     cout << "==============================" << "\n";
 
