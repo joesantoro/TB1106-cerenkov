@@ -38,15 +38,22 @@ void TB1106Analysis() {
     cout << "----------------------------------------" << "\n\n";
 
     double vertexX, vertexY, vertexZ;
+    double vertexX_H, vertexY_H, vertexZ_H;
     double dirX, dirY, dirZ;
     double CerHitX, CerHitY, CerHitZ;
-    int PID, EventID1,EventID2,numEvents, nentries,nentries2;
+    int PID, PID2, EventID1,EventID2,numEvents, nentries,nentries2;
+    int NumCerPhotons;
    
 
     tr->SetBranchAddress("CerHitX", &CerHitX);
     tr->SetBranchAddress("CerHitY", &CerHitY);
     tr->SetBranchAddress("CerHitZ", &CerHitZ);
+    tr->SetBranchAddress("vertexX", &vertexX_H);
+    tr->SetBranchAddress("vertexY", &vertexY_H);
+    tr->SetBranchAddress("vertexZ", &vertexZ_H);
     tr->SetBranchAddress("EventID", &EventID1);
+    tr->SetBranchAddress("fEvent", &PID2);
+    tr->SetBranchAddress("NumCerPhotons", &NumCerPhotons);
 
     tr2->SetBranchAddress("vertexX", &vertexX);
     tr2->SetBranchAddress("vertexY", &vertexY);
@@ -61,17 +68,21 @@ void TB1106Analysis() {
 
     nentries  =  (Int_t)tr->GetEntries(); //ENTRIES IN THE HIT NTUPLE
     nentries2 = (Int_t)tr2->GetEntries(); //ENTRIES IN THE PRODUCTION NTUPLE
+    NumCerPhotons = (Int_t)tr2->GetMaximum("NumCerPhotons");
 
-    double hit_event_ID[nentries];
+    int hit_event_ID[nentries];
+    int* hit_event_ID_ptr;
 
-    cout << "THERE ARE " << numEvents << " EVENTS GENERATED IN THIS RUN" <<  "\n";
-    cout << "THERE ARE " << nentries2 << " CERENKOV TRACKS" << "\n";
-    cout << "THERE ARE " << nentries  << " HITS IN THE DETECTOR ARRAY" << "\n\n";
+    cout << "THERE WERE " << numEvents     <<  " PRIMARY EVENTS IN THIS RUN"                   <<  "\n";
+    cout << "THERE ARE  " << nentries2     <<  " CERENKOV-GENERATING TRACKS IN THE H20 VOLUME" << "\n";
+    cout << "THERE ARE  " << nentries      <<  " CERENKOV HITS IN THE DETECTOR ARRAY"          << "\n";
+    cout << "THERE WERE " << NumCerPhotons <<  " CERENKOV PHOTONS PRODUCED"                    << "\n\n";
 
     //HISTO OF PARTICLE PIDS IN DETECTOR VOLUME
     gStyle->SetHistFillColor(8);
     gStyle->SetHistFillStyle(3002);
-    TH1D* hPID    = new TH1D("hPID", "PID", 50, -50.0, 100.0);
+    TH1D* hPID    = new TH1D("hPID",  "PID-PRODUCTION", 50, -30.0, 30.0);
+    TH1D* hPID2   = new TH1D("hPID2", "PID-HITS"      , 50, -30.0, 30.0);
 
     TH1D* hVx  = new TH1D("hVx", "Vertex position X(mm)", 100, -1000.0, 1000.0);
     TH1D* hDx  = new TH1D("hDx", "Dir Cosine X", 100, -1.0, 1.0);
@@ -91,10 +102,10 @@ void TB1106Analysis() {
     TH1D* hHz  = new TH1D("hHz", "Hit position Z(mm)", 100, -300.0, 300.0);
 
     //2D plot(s)
-    TH2* hHxHy   = new TH2F("hHxHy"  , "X-Y distribution of Detector hits", 100, -300.0, 300.0, 100, -300.0, 300.0);
+    TH2* hHxHy   = new TH2F("hHxHy"  , "X-Y distribution of Detector hits (mm)", 100, -300.0, 300.0, 100, -300.0, 300.0);
 
     //3D plot(s)
-    TH3* hVxVyVz = new TH3F("hVxVyVz", "3D distribution of Detected Cerenkov Vertex Positions", 100, -250.0, 250.0, 100, -250.0, 250.0, 100, -250.0, 250.0);
+    TH3* hVxVyVz = new TH3F("hVxVyVz", "3D distribution of Detected Cerenkov Vertex Positions (mm)", 100, -250.0, 250.0, 100, -250.0, 250.0, 100, -250.0, 250.0);
     
 
     //EVENT LOOP TO FILL THE HIT HISTOGRAMS
@@ -112,21 +123,26 @@ void TB1106Analysis() {
         hHz->Fill(CerHitZ);
         hHxHy->Fill(CerHitX, CerHitY);
         hEvents->Fill(EventID1);
+        hPID2->Fill(PID2);
+        hVxVyVz->Fill(vertexX_H, vertexZ_H, vertexY_H);
+
         hit_event_ID[i]=EventID1;
     }
+
+    hit_event_ID_ptr = hit_event_ID;
 
     //EVENT LOOP TO FILL THE PRODUCTION HISTOGRAMS
     cout << "PRODUCTION LOOP" << "\n";
     cout << "===============" << "\n";
     cout << "PROCESSING " << nentries2 << " CERENKOV TRACKS" << "\n\n";
 
-    //----- PROGRESS BAR -------------------
+    //----- PROGRESS BAR --------------------------------------------------------------
     TGMainFrame* fMain         = new TGMainFrame(gClient->GetDefaultRoot(), 1000, 500);
     TGHorizontalFrame* fHFrame = new TGHorizontalFrame(fMain, 0, 0, 0);
     TGHProgressBar* progBar    = new TGHProgressBar(fHFrame, 500);
 
     progBar->SetBarColor("lightblue");
-    progBar->ShowPosition(kTRUE, kFALSE, "%.0f tracks");
+    progBar->ShowPosition(kTRUE, kFALSE, "%.0f Cerenkov-Generating Tracks in the H20 Volume");
     progBar->SetRange(0, nentries2);
 
     fHFrame->Resize(300, 300);
@@ -154,13 +170,6 @@ void TB1106Analysis() {
         hDy->Fill(dirY);
         hDz->Fill(dirZ);
         hPID->Fill(PID);
-
-        for (Int_t j = 1; j<=nentries; j++)
-        {
-            if (EventID2 == hit_event_ID[j]) {
-                hVxVyVz->Fill(vertexX, vertexZ, vertexY);
-             }
-            }
     }
 
     cout << "RENDERING HISTOGRAMS AND PLOTS..." << "\n";
@@ -190,9 +199,11 @@ void TB1106Analysis() {
 
 //The 4th canvas
       TCanvas* Can4 = new TCanvas("c4", "PID");
-      hPID->Draw();
+      Can4->Divide(2, 1);
+      Can4->cd(1);hPID->Draw();
+      Can4->cd(2);hPID2->Draw();
 
-      //The 4th canvas
+//The 5th canvas
       TCanvas* Can5 = new TCanvas("c5", "EventID");
       hEvents->Draw();
 

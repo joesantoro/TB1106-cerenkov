@@ -73,6 +73,7 @@ void TB1106RunAction::BeginOfRunAction(const G4Run*)
     man->CreateNtupleDColumn(0,"dirY");
     man->CreateNtupleDColumn(0,"dirZ");
     man->CreateNtupleIColumn(0,"EventID"); //Event ID
+    man->CreateNtupleIColumn(0,"NumCerPhotons"); //Number of Cerenkov Photons
     man->FinishNtuple(0);
 
  //Cerenkov detector-specific histograms
@@ -81,7 +82,11 @@ void TB1106RunAction::BeginOfRunAction(const G4Run*)
     man->CreateNtupleDColumn(1,"CerHitX");//DETECTOR HIT POSITION
     man->CreateNtupleDColumn(1,"CerHitY");
     man->CreateNtupleDColumn(1,"CerHitZ");
+    man->CreateNtupleDColumn(1,"vertexX");//VERTEX POSITIONS
+    man->CreateNtupleDColumn(1,"vertexY");
+    man->CreateNtupleDColumn(1,"vertexZ");
     man->CreateNtupleIColumn(1,"EventID"); //Event ID
+    man->CreateNtupleIColumn(1,"fEvent");  //PID
     man->FinishNtuple(1);
 
 }
@@ -139,17 +144,6 @@ void TB1106RunAction::EndOfRunAction(const G4Run* run)
      << G4endl
      << "--------------------End of Local Run------------------------";
   }
-  
-  /*G4cout
-     << G4endl
-     << " The run consists of " << nofEvents << " "<< runCondition
-     << G4endl
-     << " Cumulated dose per run, in scoring volume : " 
-     << G4BestUnit(dose,"Dose") << " rms = " << G4BestUnit(rmsDose,"Dose")
-     << G4endl
-     << "------------------------------------------------------------"
-     << G4endl
-     << G4endl;*/
 
   //MY ADDITIONS FOR THE CREATION OF A ROOT DATA FILE
   G4AnalysisManager* man = G4AnalysisManager::Instance();

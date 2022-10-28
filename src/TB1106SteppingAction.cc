@@ -14,11 +14,15 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+G4int n_photons = 0;
+
 TB1106SteppingAction::TB1106SteppingAction(TB1106EventAction* eventAction)
 : G4UserSteppingAction(),
   fEventAction(eventAction),
   fScoringVolume()
-{}
+  
+{
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -53,6 +57,7 @@ void TB1106SteppingAction::UserSteppingAction(const G4Step* step)
   //--------------------------------------------------------------
     G4int evt;
     G4int photons = 0;
+    //G4int n_photons;
 
     G4Track* theTrack = step->GetTrack();
     G4StepPoint* preStepPoint  = step->GetPreStepPoint();
@@ -81,19 +86,22 @@ void TB1106SteppingAction::UserSteppingAction(const G4Step* step)
     if (process_name == "Cerenkov") {
         G4Cerenkov* proc = (G4Cerenkov*)postStepPoint->GetProcessDefinedStep();
         photons = proc->GetNumPhotons();
+        n_photons = n_photons + photons;
 
-        /*G4cout << "------ CERENKOV PRODUCTION LOOP -------------" << G4endl;
-        G4cout << "IN EVENT       : " << evt << G4endl;
-        G4cout << "THE PID IS     : " << PDGcode << G4endl;
-        G4cout << "THE TRACK ID IS: " << trackID << G4endl;
-        G4cout << "THE PROCESS IS : " << process_name << G4endl;
-        G4cout << "IT PRODUCED    : " << photons << " PHOTONS" << G4endl;
-        G4cout << "THE VOLUME IS  : " << volume->GetName() << G4endl;
-        G4cout << "Vertex Position: " << vertex << G4endl;
-        G4cout << "Hit Position   : " << posParticle << G4endl;
-        G4cout << "Direction      : " << dir << G4endl;
-        G4cout << "Kinetic Energy : " << kEnergy << G4endl;
-        G4cout << "---------------------------------------\n\n" << G4endl;*/
+        G4cout << "*******************************************\n" << G4endl;
+        G4cout << "********** CERENKOV PRODUCTION ************" << G4endl;
+        G4cout << "IN EVENT       : " << evt                    << G4endl;
+        G4cout << "THE PID IS     : " << PDGcode                << G4endl;
+        G4cout << "THE TRACK ID IS: " << trackID                << G4endl;
+        G4cout << "THE PROCESS IS : " << process_name           << G4endl;
+        G4cout << "IT PRODUCED    : " << photons << " PHOTONS"  << G4endl;
+        G4cout << "THE VOLUME IS  : " << volume->GetName()      << G4endl;
+        G4cout << "Vertex Position: " << vertex                 << G4endl;
+        G4cout << "Direction      : " << dir                    << G4endl;
+        G4cout << "Kinetic Energy : " << kEnergy   <<" MeV"     << G4endl;
+        G4cout << "Total # of Photons: " << n_photons           << G4endl;
+        G4cout << "*****************************************\n  " << G4endl;
+        G4cout << "*****************************************\n\n" << G4endl;
 
         man->FillNtupleIColumn(0,0, PDGcode);
         man->FillNtupleDColumn(0,1, vertex[0]);
@@ -103,6 +111,7 @@ void TB1106SteppingAction::UserSteppingAction(const G4Step* step)
         man->FillNtupleDColumn(0,5, dir[1]);
         man->FillNtupleDColumn(0,6, dir[2]);
         man->FillNtupleIColumn(0,7, evt);
+        man->FillNtupleIColumn(0,8, n_photons);
         man->AddNtupleRow(0);
     }
      

@@ -26,11 +26,13 @@ G4bool TB1106SensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *R
 	G4ThreeVector posParticle = preStepPoint->GetPosition();
 	G4ThreeVector vertex      = track->GetVertexPosition();
 	G4ThreeVector dir         = track->GetMomentumDirection();
+	G4double kE               = track->GetKineticEnergy();
 
 	const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
 
-	G4int copyNO  = touchable->GetCopyNumber();
-	G4int trackID = track->GetTrackID();
+	G4int copyNO   = touchable->GetCopyNumber();
+	G4int trackID  = track->GetTrackID();
+	G4int PtrackID = track->GetParentID();
 
 	G4VPhysicalVolume* physVol = touchable->GetVolume();
 	G4ThreeVector pos = physVol->GetTranslation();
@@ -47,28 +49,30 @@ G4bool TB1106SensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *R
 
 	//Fill the NTuple with Cerenkov hit information
 	  G4AnalysisManager* man = G4AnalysisManager::Instance();
-	 
-	if (process_name == "Cerenkov") {  
-      G4Cerenkov* proc = (G4Cerenkov*) postStepPoint->GetProcessDefinedStep();
-	  photons = proc->GetNumPhotons();
 
-	  G4cout << "------ CERENKOV DETECTED LOOP -------------" << G4endl;
-	  G4cout << "IN EVENT       : " << evt                    << G4endl;
-	  G4cout << "THE TRACK ID IS: " << trackID                << G4endl;
-      G4cout << "THE PROCESS IS : " << process_name           << G4endl;
-	  G4cout << "THE VOLUME IS  : " << physVol->GetName()     << G4endl;
-	  G4cout << "Hit Position   : " << posParticle            << G4endl;
-	  G4cout << "Direction      : " << dir                    << G4endl;
-	  G4cout << "---------------------------------------\n\n" << G4endl;
+	  G4cout << "------ DETECTED CERENKOV EVENT -------------------" << G4endl;
+	  G4cout << "IN EVENT              : " << evt                    << G4endl;
+	  G4cout << "THE PID IS            : " << PDGcode                << G4endl;
+	  G4cout << "THE TRACK ID IS       : " << trackID                << G4endl;
+	  G4cout << "THE PARENT TRACK ID IS: " << PtrackID               << G4endl;
+      G4cout << "THE PROCESS IS        : " << process_name           << G4endl;
+	  G4cout << "THE VOLUME IS         : " << physVol->GetName()     << G4endl;
+	  G4cout << "Hit Position          : " << posParticle            << G4endl;
+	  G4cout << "Vertex Position       : " << vertex                 << G4endl;
+	  G4cout << "Direction             : " << dir                    << G4endl;
+	  G4cout << "Kinetic Energy        : " << kE <<" MeV"            << G4endl;
+	  G4cout << "----------------------------------------------\n\n" << G4endl;
 
 	  man->FillNtupleDColumn(1,0, posParticle[0]);
 	  man->FillNtupleDColumn(1,1, posParticle[1]);
 	  man->FillNtupleDColumn(1,2, posParticle[2]);
-	  man->FillNtupleIColumn(1,3, evt);
+	  man->FillNtupleDColumn(1,3, vertex[0]);
+	  man->FillNtupleDColumn(1,4, vertex[1]);
+	  man->FillNtupleDColumn(1,5, vertex[2]);
+	  man->FillNtupleIColumn(1,6, evt);
+	  man->FillNtupleIColumn(1,7, PDGcode);
+	  
 	  man->AddNtupleRow(1);
-	  }
-
-	
     
 	return true;
 }
