@@ -73,7 +73,7 @@ void TB1106RunAction::BeginOfRunAction(const G4Run*)
     man->CreateNtupleDColumn(0,"dirY");
     man->CreateNtupleDColumn(0,"dirZ");
     man->CreateNtupleIColumn(0,"EventID"); //Event ID
-    man->CreateNtupleIColumn(0,"NumCerPhotons"); //Number of Cerenkov Photons
+    man->CreateNtupleIColumn(0,"NumCerPhotons"); //Number of Cerenkov Photons Generated
     man->FinishNtuple(0);
 
  //Cerenkov detector-specific histograms

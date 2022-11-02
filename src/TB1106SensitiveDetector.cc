@@ -50,7 +50,7 @@ G4bool TB1106SensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *R
 	//Fill the NTuple with Cerenkov hit information
 	  G4AnalysisManager* man = G4AnalysisManager::Instance();
 
-	  G4cout << "------ DETECTED CERENKOV EVENT -------------------" << G4endl;
+	  /*G4cout << "------ DETECTED CERENKOV EVENT -------------------" << G4endl;
 	  G4cout << "IN EVENT              : " << evt                    << G4endl;
 	  G4cout << "THE PID IS            : " << PDGcode                << G4endl;
 	  G4cout << "THE TRACK ID IS       : " << trackID                << G4endl;
@@ -61,7 +61,7 @@ G4bool TB1106SensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *R
 	  G4cout << "Vertex Position       : " << vertex                 << G4endl;
 	  G4cout << "Direction             : " << dir                    << G4endl;
 	  G4cout << "Kinetic Energy        : " << kE <<" MeV"            << G4endl;
-	  G4cout << "----------------------------------------------\n\n" << G4endl;
+	  G4cout << "----------------------------------------------\n\n" << G4endl;*/
 
 	  man->FillNtupleDColumn(1,0, posParticle[0]);
 	  man->FillNtupleDColumn(1,1, posParticle[1]);

@@ -88,7 +88,7 @@ void TB1106SteppingAction::UserSteppingAction(const G4Step* step)
         photons = proc->GetNumPhotons();
         n_photons = n_photons + photons;
 
-        G4cout << "*******************************************\n" << G4endl;
+        /*G4cout << "*******************************************\n" << G4endl;
         G4cout << "********** CERENKOV PRODUCTION ************" << G4endl;
         G4cout << "IN EVENT       : " << evt                    << G4endl;
         G4cout << "THE PID IS     : " << PDGcode                << G4endl;
@@ -101,7 +101,7 @@ void TB1106SteppingAction::UserSteppingAction(const G4Step* step)
         G4cout << "Kinetic Energy : " << kEnergy   <<" MeV"     << G4endl;
         G4cout << "Total # of Photons: " << n_photons           << G4endl;
         G4cout << "*****************************************\n  " << G4endl;
-        G4cout << "*****************************************\n\n" << G4endl;
+        G4cout << "*****************************************\n\n" << G4endl;*/
 
         man->FillNtupleIColumn(0,0, PDGcode);
         man->FillNtupleDColumn(0,1, vertex[0]);

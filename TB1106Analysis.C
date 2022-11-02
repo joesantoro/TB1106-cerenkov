@@ -53,7 +53,6 @@ void TB1106Analysis() {
     tr->SetBranchAddress("vertexZ", &vertexZ_H);
     tr->SetBranchAddress("EventID", &EventID1);
     tr->SetBranchAddress("fEvent", &PID2);
-    tr->SetBranchAddress("NumCerPhotons", &NumCerPhotons);
 
     tr2->SetBranchAddress("vertexX", &vertexX);
     tr2->SetBranchAddress("vertexY", &vertexY);
@@ -63,6 +62,7 @@ void TB1106Analysis() {
     tr2->SetBranchAddress("dirZ",    &dirZ);
     tr2->SetBranchAddress("fEvent",  &PID);
     tr2->SetBranchAddress("EventID", &EventID2);
+    tr2->SetBranchAddress("NumCerPhotons", &NumCerPhotons);
 
     numEvents = (Int_t)tr2->GetMaximum("EventID"); //EVENTS GENERATED
 
@@ -72,11 +72,15 @@ void TB1106Analysis() {
 
     int hit_event_ID[nentries];
     int* hit_event_ID_ptr;
-
-    cout << "THERE WERE " << numEvents     <<  " PRIMARY EVENTS IN THIS RUN"                   <<  "\n";
-    cout << "THERE ARE  " << nentries2     <<  " CERENKOV-GENERATING TRACKS IN THE H20 VOLUME" << "\n";
-    cout << "THERE ARE  " << nentries      <<  " CERENKOV HITS IN THE DETECTOR ARRAY"          << "\n";
-    cout << "THERE WERE " << NumCerPhotons <<  " CERENKOV PHOTONS PRODUCED"                    << "\n\n";
+    
+    double EFF;
+    EFF = ((double)nentries/(double)NumCerPhotons)*100.;
+    
+    cout << "THERE ARE " << numEvents+1   <<  " PRIMARY EVENTS IN THIS RUN"                   << "\n";
+    cout << "THERE ARE " << nentries2     <<  " CERENKOV-GENERATING TRACKS IN THE H20 VOLUME" << "\n";
+    cout << "THERE ARE " << nentries      <<  " CERENKOV HITS IN THE DETECTOR ARRAY"          << "\n";
+    cout << "THERE ARE " << NumCerPhotons <<  " CERENKOV PHOTONS PRODUCED"                    << "\n";
+    cout << "THE CERENKOV DETECTION EFFICIENCY IS: " << EFF << "%"         << "\n\n";
 
     //HISTO OF PARTICLE PIDS IN DETECTOR VOLUME
     gStyle->SetHistFillColor(8);
@@ -171,6 +175,8 @@ void TB1106Analysis() {
         hDz->Fill(dirZ);
         hPID->Fill(PID);
     }
+
+    delete fMain;
 
     cout << "RENDERING HISTOGRAMS AND PLOTS..." << "\n";
     cout << "==============================" << "\n";

@@ -9,12 +9,15 @@
 
 # Initialize kernel
 
+#### ACTIVATE CERENKOV #######
+/process/optical/processActivation Cerenkov 1
+
 ######## SUPPRESS SOME OPTICAL PROCESSESS WE DON'T CARE ABOUT
 
+/process/optical/processActivation Scintillation 0
 #/process/optical/processActivation OpRayleigh 0
 #/process/optical/processActivation OpMieHG 0
 #/process/optical/processActivation OpWLS2 0
-/process/optical/processActivation Scintillation 0
 #/process/optical/processActivation OpWLS 0
 
 
@@ -31,6 +34,7 @@
 /gun/particle gamma
 /gun/energy 6 MeV
 #
-/run/beamOn 100000
+#
+/run/beamOn 10000000
 
 #

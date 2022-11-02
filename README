@@ -4,33 +4,28 @@
      Geant4 - an Object-Oriented Toolkit for Simulation in HEP
      =========================================================
 
-                            Example B1
-                            -----------
+                            Cerenkov energy spectrometer for clincal medical photon/electron beams
+                            ----------------------------------------------------------------------
 
- This example demonstrates a very simple application where an energy
- deposit is accounted in user actions and their associated objects
- and a dose in a selected volume is calculated. 
+ This simulation investigates the feasibility of using the measured Cerenkov photon energy spectrum generated in a measurement tank of water to characterize the spatially-dependent energy
+ spectrum of a photon or electron beam from a TruBeam medical LINAC. 
 
 	
  1- GEOMETRY DEFINITION
 	
-   The geometry is constructed in the B1DetectorConstruction class.
-   The setup consists of a an envelope of box shape containing two
-   volumes: a spherical cone and a trapezoid.
+   The geometry is constructed in the TB1106DetectorConstruction class.
+   The setup consists of a a plexiglass water tank containing and water "evelope", a 
+   50x50cm thin silicon dioxide slab functioning as a defacto CCD array, and an air world volume 
 
-   In this example we use  some common materials materials for medical
-   applications. The envelope is made of water and the two inner volumes
-   are made from tissue and bone materials.  
    The materials are created with the help of the G4NistManager class,
    which allows to build a material from the NIST database using their
    names. All available materials can be found in the Geant4 User's Guide
    for Application Developers, Appendix 10: Geant4 Materials Database.
 		
  2- PHYSICS LIST
- 
-   The particle's type and the physic processes which will be available
-   in this example are set in the QBBC physics list. This physics list 
-   requires data files for electromagnetic and hadronic processes.
+   The physics lists used in this simulation are defined in the TB1106PhysicsList class.
+   We use the G4EmStandardPhysics list as well as the G4OpticalPhysics list.
+   
    See more on installation of the datasets in Geant4 Installation Guide,
    Chapter 3.3: Note On Geant4 Datasets:
    http://geant4.web.cern.ch/geant4/UserDocumentation/UsersGuides
@@ -44,47 +39,64 @@
    
  3- ACTION INITALIZATION
 
-   A newly introduced class, B1ActionInitialization, instantiates and registers 
+   The class, TB1106ActionInitialization, instantiates and registers 
    to Geant4 kernel all user action classes.
 
    While in sequential mode the action classes are instatiated just once,
    via invoking the method:
-      B1ActionInitialization::Build() 
+      TB1106ActionInitialization::Build() 
    in multi-threading mode the same method is invoked for each thread worker
    and so all user action classes are defined thread-local.
 
    A run action class is instantiated both thread-local 
    and global that's why its instance is created also in the method
-      B1ActionInitialization::BuildForMaster() 
+      TB1106ActionInitialization::BuildForMaster() 
    which is invoked only in multi-threading mode.
   	 
  4- PRIMARY GENERATOR
   
-   The primary generator is defined in the B1PrimaryGeneratorAction class.
-   The default kinematics is a 6 MeV gamma, randomly distributed in front
-   of the envelope across 80% of the transverse (X,Y) envelope size. 
+   The primary generator is defined in the TB1106PrimaryGeneratorAction class.
+   The default kinematics is a 6 MeV gamma beam, randomly distributed in a 10x10cm
+   area on the surface of the water envelope. The beam is directed in the -y direction.
+   The beam origin is at y=+42.5cm (32.5cm above the surface of the water).
    This default setting can be changed via the Geant4 built-in commands 
    of the G4ParticleGun class.
      
- 5- DETECTOR RESPONSE
-
-   This example demonstrates a simple scoring implemented directly
-   in the user action classes.  Alternative ways of scoring via Geant4 classes 
-   can be found in the other examples.
+ 5- SENSITIVE DETECTOR
    
+   A sensitive detector volume is defined in the TB1106SensitiveDetector class. For now
+   it's an 50x50cm amorphous silicon slab emulating a CCD array. The Cerenkov photons generated
+   in the water cube envelope (and elsewhere) are detected here. 
+   Within the ProcessHits method of the class, a G4AnalysisManager object is instantiated
+   and a "Hits" NTuple is filled with the detected Cerenokov track detected position (in the detector),
+   the vertex position of the Cerenkov-generating track, the event number, the PDG code of the track. 
+   This information can be used to correlate detected Cerenkov photons with their respective origin (vertex) 
+   positions in the water tank (or other volume).
+   
+ 6- CERENKOV PRODUCTION AND STEPPING ACTION CLASS
+  
+   This class is responsible for "stepping" particles generated by predefined physics processess
+   through the volumes in the simulated world. We make use of this class here by filling a "Production"
+   NTuple with Cerenkov-producing tracks. We instantiate the a G4AnalysisManager object and fill the 
+   Production NTuple with the PDG code, vertex positions, momentum direction (direction cosines), event number,
+   and number of Cerenkov photons generated for each Cerenkov-generating track.
+
+    
+
+   ********** ORIGINAL ***********************************************
    The energy deposited is collected step by step for a selected volume
-   in B1SteppingAction and accumulated event by event in B1EventAction.
+   in TB1106SteppingAction and accumulated event by event in TB1106EventAction.
 
-   At end of event, the value acummulated in B1EventAction is added in B1RunAction
-   and summed over the whole run (see B1EventAction::EndOfevent()).
+   At end of event, the value acummulated in TB1106EventAction is added in TB1106RunAction
+   and summed over the whole run (see TB1106EventAction::EndOfevent()).
 
-   Total dose deposited is computed at B1RunAction::EndOfRunAction(), 
+   Total dose deposited is computed at TB1106RunAction::EndOfRunAction(), 
    and printed together with informations about the primary particle.
    In multi-threading mode the energy accumulated in G4Accumulable objects per
-   workers is merged to the master in B1RunAction::EndOfRunAction() and the final
+   workers is merged to the master in TB1106RunAction::EndOfRunAction() and the final
    result is printed on the screen.
    
-   G4Parameter<G4double> type instead of G4double type is used for the B1RunAction
+   G4Parameter<G4double> type instead of G4double type is used for the TB1106RunAction
    data members in order to facilitate merging of the values accumulated on workers 
    to the master.  Currently the accumulables have to be registered to G4AccumulablesManager
    and G4AccumulablesManager::Merge() has to be called from the users code. This is planned
@@ -93,6 +105,7 @@
 
    An example of creating and computing new units (e.g., dose) is also shown 
    in the class constructor. 
+   ********************************************************************************
 
  The following paragraphs are common to all basic examples
 
