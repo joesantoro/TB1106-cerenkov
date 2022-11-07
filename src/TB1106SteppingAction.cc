@@ -81,7 +81,7 @@ void TB1106SteppingAction::UserSteppingAction(const G4Step* step)
     const G4String Partname = parDef->GetParticleName();
 
     //----------- Fill Production NTuple ---------------- 
-    G4AnalysisManager* man = G4AnalysisManager::Instance();
+     G4AnalysisManager* man = G4AnalysisManager::Instance();
 
     if (process_name == "Cerenkov") {
         G4Cerenkov* proc = (G4Cerenkov*)postStepPoint->GetProcessDefinedStep();

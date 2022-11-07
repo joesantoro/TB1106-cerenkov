@@ -51,7 +51,8 @@ TB1106RunAction::~TB1106RunAction()
 void TB1106RunAction::BeginOfRunAction(const G4Run*)
 { 
   // inform the runManager to save random number seed
-  G4RunManager::GetRunManager()->SetRandomNumberStore(false);
+  //G4RunManager::GetRunManager()->SetRandomNumberStore(false);
+  G4RunManager::GetRunManager()->SetRandomNumberStore(true);
 
   // reset accumulables to their initial values
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
@@ -61,7 +62,7 @@ void TB1106RunAction::BeginOfRunAction(const G4Run*)
   //FOR MORE SOPHISTICATED ANALYSIS AND OUTPUT THAN THE ACCUMULABLE VARIABLES
   G4AnalysisManager* man  = G4AnalysisManager::Instance();
   
-  man->OpenFile("output.root");
+    man->OpenFile("output.root");
 
     man->CreateNtuple("Production", "Production");
 

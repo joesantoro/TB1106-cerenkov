@@ -30,6 +30,11 @@ int main(int argc,char** argv)
   // Construct the default run manager
   //----------------------------------
   //G4RunManager* runManager = new G4RunManager();
+  
+  //Ensure the Random Seed is different for each new run
+  CLHEP::HepRandom::setTheEngine(new CLHEP::MTwistEngine);
+  CLHEP::HepRandom::setTheSeed((unsigned)clock());
+
   auto* runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default, 4);
 
   // Set mandatory initialization classes
